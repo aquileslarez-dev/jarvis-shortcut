@@ -9,19 +9,31 @@ on:
 jobs:
   sign:
     runs-on: macos-latest
-    
+
     steps:
       - name: 📥 Descargar código
         uses: actions/checkout@v4
 
-      - name: ✍️ Firmar el atajo con shortcuts sign
+      - name: 🔍 Diagnóstico del entorno
         run: |
-          echo "Firmando Jarvis.shortcut..."
-          shortcuts sign -m anyone -i Jarvis.shortcut -o Jarvis_FIRMADO.shortcut
-          echo "✅ Firmado exitosamente"
-          ls -lh *.shortcut
+          echo "macOS version:"
+          sw_vers
+          echo "Xcode version:"
+          xcode-select --version
+          echo "shortcuts path:"
+          which shortcuts || echo "shortcuts no encontrado en PATH"
+          ls /usr/bin/shortcuts || echo "No está en /usr/bin"
+          xcrun --find shortcuts 2>/dev/null || echo "xcrun tampoco lo encuentra"
 
-      - name: 📤 Subir atajo firmado como artefacto
+      - name: ✍️ Firmar con xcrun shortcuts
+        run: |
+          echo "Archivo a firmar:"
+          ls -lh Jarvis.shortcut
+          xcrun shortcuts sign -m anyone -i Jarvis.shortcut -o Jarvis_FIRMADO.shortcut
+          echo "✅ Firmado:"
+          ls -lh Jarvis_FIRMADO.shortcut
+
+      - name: 📤 Subir artefacto
         uses: actions/upload-artifact@v4
         with:
           name: Jarvis-Firmado-para-iPhone
