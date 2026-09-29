@@ -1,0 +1,29 @@
+name: ✍️ Firmar Jarvis.shortcut con macOS
+
+on:
+  push:
+    paths:
+      - 'Jarvis.shortcut'
+  workflow_dispatch:
+
+jobs:
+  sign:
+    runs-on: macos-latest
+    
+    steps:
+      - name: 📥 Descargar código
+        uses: actions/checkout@v4
+
+      - name: ✍️ Firmar el atajo con shortcuts sign
+        run: |
+          echo "Firmando Jarvis.shortcut..."
+          shortcuts sign -m anyone -i Jarvis.shortcut -o Jarvis_FIRMADO.shortcut
+          echo "✅ Firmado exitosamente"
+          ls -lh *.shortcut
+
+      - name: 📤 Subir atajo firmado como artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: Jarvis-Firmado-para-iPhone
+          path: Jarvis_FIRMADO.shortcut
+          retention-days: 30
